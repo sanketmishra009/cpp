@@ -17,6 +17,8 @@ public:
     void advance() { cursor = cursor->next; }
     void print();
     void addel(int n);
+    void printR();
+    void resetC() { cursor = head; }
 
 private:
     listel *head;
@@ -47,6 +49,19 @@ void list::addel(int d)
     }
 }
 
+void list::printR()
+{
+    // cursor = head;
+    if (cursor == nullptr)
+    {
+        cout << "\n";
+        return;
+    }
+    cout << cursor->data << "\t";
+    advance();
+    return printR();
+}
+
 int main()
 {
     list a;
@@ -54,5 +69,6 @@ int main()
     {
         a.addel(i * i);
     }
-    a.print();
+    a.resetC();
+    a.printR();
 }
