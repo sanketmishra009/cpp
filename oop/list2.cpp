@@ -51,15 +51,21 @@ void list::addel(int d)
 
 void list::printR()
 {
-    // cursor = head;
-    if (cursor == nullptr)
+    if (cursor != nullptr)
     {
-        cout << "\n";
-        return;
+        cout << cursor->data;
+        advance();
+        if (cursor != nullptr)
+        {
+            cout << "->";
+        }
+        else
+        {
+            cout << "\n";
+        }
+        return printR();
     }
-    cout << cursor->data << "\t";
-    advance();
-    return printR();
+    return;
 }
 
 int main()
