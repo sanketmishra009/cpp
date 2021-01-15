@@ -32,8 +32,17 @@ void showGraph(vector<edge> adj[], int size)
 
 int main()
 {
-    int V = 5;
+    int V = 6;
     vector<edge> adj[V];
+    vector<edge> res;
+    vector<edge> sSet;
+
+    // set inf status to nodes.
+    for (int i = 0; i < V; i++)
+    {
+        edge x(i, 100);
+    }
+
     addEdge(adj, 0, 1, 5);
     addEdge(adj, 0, 2, 1);
     addEdge(adj, 1, 3, 6);
@@ -41,6 +50,4 @@ int main()
     addEdge(adj, 2, 4, 9);
     addEdge(adj, 3, 5, 3);
     addEdge(adj, 4, 5, 2);
-    showGraph(adj, V);
-    return 0;
 }

@@ -21,10 +21,11 @@ void showGraph(vector<edge> adj[], int size)
 {
     for (int i = 0; i < size; i++)
     {
-        cout << "adjecent list rep of vertex: " << i << "\n head";
+        cout << "adjecent list rep of vertex: " << static_cast<char>(i + 97) << "\n head";
         for (auto x : adj[i])
         {
-            cout << "->" << x.node << ", weight: " << x.weight << " ";
+            char z = 97 + x.node;
+            cout << "->" << z << ", weight: " << x.weight << " ";
         }
         cout << "\n";
     }
@@ -32,15 +33,15 @@ void showGraph(vector<edge> adj[], int size)
 
 int main()
 {
-    int V = 5;
+    int V = 6;
     vector<edge> adj[V];
-    addEdge(adj, 0, 1, 2);
-    addEdge(adj, 0, 4, 3);
-    addEdge(adj, 1, 2, 5);
-    addEdge(adj, 1, 3, 1);
-    addEdge(adj, 1, 4, 2);
-    addEdge(adj, 2, 3, 99);
-    addEdge(adj, 3, 4, 45);
+    addEdge(adj, 0, 1, 5);
+    addEdge(adj, 0, 2, 1);
+    addEdge(adj, 1, 3, 6);
+    addEdge(adj, 2, 3, 4);
+    addEdge(adj, 2, 4, 9);
+    addEdge(adj, 3, 5, 3);
+    addEdge(adj, 4, 5, 2);
     showGraph(adj, V);
     return 0;
 }
