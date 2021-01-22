@@ -24,8 +24,8 @@ int main()
 {
     point s;
     double d = 2.4;
-    s = d;
-    cout << s.x << endl; //implicit conversion.
+    s = d; //implicit conversion.
+    cout << s.x << endl;
     s = 0;
     s = static_cast<point>(d); //explicit conversion.
     cout << s.x << endl;

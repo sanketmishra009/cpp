@@ -4,6 +4,7 @@
 #include <iostream>
 #include <vector>
 #include <ctime>
+#include "randomGraph.h"
 using namespace std;
 
 class edge
@@ -77,7 +78,7 @@ void createRandomGraph(vector<node> &graph, int size)
         for (int j = 0; j < size; j++)
         {
             exists = edgeExists(graph, i, j);
-            if (!exists && i != j && prob() > 0.5)
+            if (!exists && i != j && prob() < 0.5)
             {
                 vector<edge> ed = createEdge(i, j);
                 graph[i].appendEdge(ed[0]);
@@ -94,7 +95,7 @@ void printGraph(vector<node> graph)
         cout << "Adj list of node: " << node.nodeNum << endl;
         for (auto edge : node.edges)
         {
-            cout << edge;
+            cout << "\t" << edge;
         }
     }
 }
@@ -112,10 +113,10 @@ vector<node> initializeGraph(int size)
 int main()
 {
     srand(time(0));
-    // cout << prob();
-    vector<node> graph = initializeGraph(4);
+    int size = 50;
+    vector<node> graph = initializeGraph(size);
     vector<edge> ed = createEdge(0, 2);
-    createRandomGraph(graph, 4);
+    createRandomGraph(graph, size);
     // graph[0].appendEdge(ed[0]);
     // graph[2].appendEdge(ed[1]);
     // ed = createEdge(0, 3);
