@@ -39,7 +39,7 @@ void initializeFinal(vector<edge> &final, int size)
         edge g(i, 100);
         final.push_back(g);
     }
-    final.at(0).weight = 0;
+    final.at(3).weight = 0;
 }
 
 void printVec(vector<edge> set)
