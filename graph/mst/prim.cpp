@@ -71,13 +71,14 @@ vector<edge> createEdge(int i, int j)
 
 void createRandomGraph(vector<node> &graph, int size)
 {
+    cout << "creating random graph." << endl;
     int exists;
     for (int i = 0; i < size; i++)
     {
         for (int j = 0; j < size; j++)
         {
             exists = edgeExists(graph, i, j);
-            if (!exists && i != j && prob() < 0.5)
+            if (!exists && i != j && prob() < 0.1)
             {
                 vector<edge> ed = createEdge(i, j);
                 graph[i].appendEdge(ed[0]);
@@ -87,7 +88,7 @@ void createRandomGraph(vector<node> &graph, int size)
     }
 }
 
-void printGraph(vector<node> graph)
+void printRandomGraph(vector<node> graph)
 {
     for (auto node : graph)
     {
@@ -109,15 +110,43 @@ vector<node> initializeGraph(int size)
     return graph;
 }
 
-node findMinFromNode(vector<node> closed, node node)
+int nodeInClosed(vector<node> closed, int nodeNUM)
 {
+    int x = 0;
+    for (auto node : closed)
+    {
+        if (node.nodeNum == nodeNUM)
+        {
+            x = 1;
+            break;
+        }
+    }
+    return x;
 }
 
-node findMinEdgeFromGraph(vector<node> closed)
+edge findMinEdgeFromNode(vector<node> closed, node node)
 {
+    // cout << "inside FindFromNode";
+    int x;
+    edge minEdge;
+    minEdge.cost = INT32_MAX;
+    for (auto edge : node.edges)
+    {
+        x = nodeInClosed(closed, edge.node);
+        if (!x && minEdge.cost > edge.cost)
+        {
+            minEdge = edge;
+        }
+    }
+    return minEdge;
+}
+
+edge findMinEdgeFromGraph(vector<node> closed)
+{
+    // cout << "inside FindEdgeFromGraph";
     //this routine finds the min cost edge that emerges from closed set to outside of the set.
-    node Gmin, nMin;
-    Gmin.cost = INT32_MIN;
+    edge Gmin, nMin;
+    Gmin.cost = INT32_MAX;
     for (auto node : closed)
     {
         nMin = findMinEdgeFromNode(closed, node);
@@ -131,39 +160,59 @@ node findMinEdgeFromGraph(vector<node> closed)
 
 void prim(vector<node> graph, node startNode)
 {
-    node GnodeMin;
+    cout << "inside prim";
+    edge GEdgeMin;
+    node addNode;
     vector<node> closed;
+    int spanCost = 0;
     closed.push_back(startNode);
+    int i = 0;
     while (1)
     {
-        GnodeMin = findMinEdgeFromGraph(closed);
-        if (GnodeMin.nodeNum)
+        cout << "Iteration: " << i++ << endl;
+        cout << endl;
+        GEdgeMin = findMinEdgeFromGraph(closed);
+        if (GEdgeMin.node != 999)
         {
-            closed.push_back(GnodeMin);
+            spanCost += GEdgeMin.cost;
+            for (auto node : graph)
+            {
+                if (node.nodeNum == GEdgeMin.node)
+                {
+                    addNode = node;
+                }
+            }
+            closed.push_back(addNode);
         }
         else
         {
             break;
         }
+        for (auto node : closed)
+        {
+            cout << node.nodeNum << "\t";
+        }
+        cout << endl;
     }
 
     //print closed.
+    cout << "Final Closed Set after algorithm: " << endl;
     for (auto node : closed)
     {
-        cout << node.nodeNum;
+        cout << node.nodeNum << "\t";
     }
+    cout << endl
+         << "Span cost: " << spanCost << endl;
 }
 
 int main()
 {
-    node n;
-    if (n.nodeNum)
-    {
-        cout << "sex";
-    }
-    else
-    {
-        cout << "fuck" << endl;
-        cout << INT32_MAX << endl;
-    }
+    srand(time(0));
+    int size = 10;
+    vector<node> graph = initializeGraph(size);
+    vector<edge> ed = createEdge(0, 2);
+    createRandomGraph(graph, size);
+    printRandomGraph(graph);
+    node startNode = graph[0];
+    prim(graph, startNode);
 }
