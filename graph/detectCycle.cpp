@@ -122,14 +122,16 @@ vector<node> initializeGraph()
     n0.appendEdge(e);
     n2.appendEdge(e);
     e.node = 2;
-    n0.appendEdge(e);
+    // n0.appendEdge(e);
     n1.appendEdge(e);
+    n4.appendEdge(e);
     e.node = 0;
     n3.appendEdge(e);
     n1.appendEdge(e);
-    n2.appendEdge(e);
+    // n2.appendEdge(e);
     e.node = 4;
     n3.appendEdge(e);
+    n2.appendEdge(e);
     vector<node> g;
     g.push_back(n0);
     g.push_back(n1);
