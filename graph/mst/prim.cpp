@@ -160,7 +160,7 @@ edge findMinEdgeFromGraph(vector<node> closed)
 
 void prim(vector<node> graph, node startNode)
 {
-    cout << "inside prim";
+    cout << "Running prim" << endl;
     edge GEdgeMin;
     node addNode;
     vector<node> closed;
@@ -208,7 +208,7 @@ void prim(vector<node> graph, node startNode)
 int main()
 {
     srand(time(0));
-    int size = 10;
+    int size = 20;
     vector<node> graph = initializeGraph(size);
     vector<edge> ed = createEdge(0, 2);
     createRandomGraph(graph, size);
