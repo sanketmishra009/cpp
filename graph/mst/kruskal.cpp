@@ -61,12 +61,74 @@ void printRandomGraph(vector<node> graph)
     }
 }
 
-void printGraph(vector<node> graph)
+//functions for checking cycle in graph.
+node getNode(vector<node> graph, int nodeNum)
 {
+    node n;
     for (auto node : graph)
     {
-        cout << node.nodeNum << "\t";
+        if (node.nodeNum == nodeNum)
+        {
+            n = node;
+        }
     }
+    return n;
+}
+
+int checkCycle(node n, node parent, vector<node> &visited, vector<node> graph)
+{
+    // cout << "visited at this iteration:" << endl;
+    // printRandomGraph(visited);
+    int cycle = 0, check = 0;
+    node curr;
+    for (auto node : visited)
+    {
+        if (node.nodeNum == n.nodeNum)
+        {
+            // cout << "cycle found at node: " << node.nodeNum << endl
+            //      << "parent node being: " << parent.nodeNum << endl;
+            // printRandomGraph(visited);
+            cycle = 1;
+            return cycle;
+        }
+    }
+    if (!cycle)
+    {
+        visited.push_back(n);
+        for (auto edge : n.edges)
+        {
+            if (edge.node != parent.nodeNum)
+            {
+                // cout << "calling checkCycle at " << edge.node << endl;
+                curr = getNode(graph, edge.node);
+                check = checkCycle(curr, n, visited, graph);
+                if (check)
+                {
+                    break;
+                }
+            }
+        }
+    }
+    return check;
+}
+
+int detectCycle(vector<node> graph)
+{
+    vector<node> visited;
+    int res = 0;
+    for (int i = 0; i < graph.size(); i++)
+    {
+        visited.clear();
+        node n = graph[i];
+        // cout << "starting node: " << n.nodeNum << endl;
+        node parent = n;
+        res = checkCycle(n, parent, visited, graph);
+        if (res == 1)
+        {
+            break;
+        }
+    }
+    return res;
 }
 
 void markVisited(vector<node> &graph, Kedge Gmin)
@@ -88,6 +150,34 @@ void markVisited(vector<node> &graph, Kedge Gmin)
     }
 }
 
+int addToTestAndCheck(vector<node> &test, Kedge k)
+{
+    edge e1, e2;
+    e1.node = k.n1;
+    e1.cost = k.cost;
+    e1.v = 1;
+    e2.v = 1;
+    e2.cost = k.cost;
+    e2.node = k.n2;
+    int res;
+    for (int i = 0; i < test.size(); i++)
+    {
+        node *node = &test[i];
+        if (node->nodeNum == k.n1)
+        {
+            node->appendEdge(e2);
+        }
+        if (node->nodeNum == k.n2)
+        {
+            node->appendEdge(e1);
+        }
+    }
+    // cout << "test after appending:" << endl;
+    // printRandomGraph(test);
+    res = detectCycle(test);
+    return res;
+}
+
 Kedge findMinEdgeFromNode(node node)
 {
     Kedge Nmin;
@@ -104,7 +194,7 @@ Kedge findMinEdgeFromNode(node node)
     return Nmin;
 }
 
-Kedge findMinEdgeFromGraph(vector<node> graph)
+Kedge findMinEdgeFromGraph(vector<node> &graph)
 {
     Kedge minEdge, GminEdge;
     GminEdge.cost = INT32_MAX;
@@ -117,23 +207,52 @@ Kedge findMinEdgeFromGraph(vector<node> graph)
         }
     }
     markVisited(graph, GminEdge);
-    cout << "after mark:" << endl;
+    // cout << "after mark:" << endl;
     // printRandomGraph(graph);
     return GminEdge;
 }
 
+//only initializes graph with empty nodes.
+vector<node> initializeEmptyGraph(int size)
+{
+    vector<node> graph(size);
+    for (int i = 0; i < graph.size(); i++)
+    {
+        graph[i].nodeNum = i;
+    }
+    return graph;
+}
+
 void kruskal(vector<node> graph)
 {
-    vector<node> closed;
+    vector<node> closed = initializeEmptyGraph(graph.size());
+    vector<node> test = initializeEmptyGraph(graph.size());
+    int check;
     node n1, n2;
     Kedge k1;
+    int i = 0, tcost = 0;
     while (1)
     {
+        cout << "iteration: " << ++i << endl;
+        test = closed;
         k1 = findMinEdgeFromGraph(graph);
-        cout << k1;
-        printRandomGraph(graph);
-        break;
+        // cout << k1;
+        if (k1.cost == INT32_MAX)
+        {
+            break;
+        }
+        check = addToTestAndCheck(test, k1);
+        cout << check << endl;
+        if (check == 0)
+        {
+            tcost += k1.cost;
+            closed = test;
+        }
+        printRandomGraph(closed);
+        cout << endl
+             << "iter cost: " << tcost << endl;
     }
+    cout << "Spanning cost: " << tcost << endl;
 }
 
 vector<node> initializeGraph()
@@ -216,71 +335,6 @@ vector<node> initializeGraph()
     g.push_back(n6);
 
     return g;
-}
-
-node getNode(vector<node> graph, int nodeNum)
-{
-    node n;
-    for (auto node : graph)
-    {
-        if (node.nodeNum == nodeNum)
-        {
-            n = node;
-        }
-    }
-    return n;
-}
-
-int checkCycle(node n, node parent, vector<node> &visited, vector<node> graph)
-{
-    // cout << "visited at this iteration:" << endl;
-    // printRandomGraph(visited);
-    int cycle = 0, check = 0;
-    node curr;
-    for (auto node : visited)
-    {
-        if (node.nodeNum == n.nodeNum)
-        {
-            // cout << "cycle found at node: " << node.nodeNum << endl
-            //      << "parent node being: " << parent.nodeNum << endl;
-            // printRandomGraph(visited);
-            cycle = 1;
-            return cycle;
-        }
-    }
-    if (!cycle)
-    {
-        visited.push_back(n);
-        for (auto edge : n.edges)
-        {
-            if (edge.node != parent.nodeNum)
-            {
-                // cout << "calling checkCycle at " << edge.node << endl;
-                curr = getNode(graph, edge.node);
-                check = checkCycle(curr, n, visited, graph);
-                if (check)
-                {
-                    break;
-                }
-            }
-        }
-    }
-    return check;
-}
-
-void detectCycle(vector<node> graph)
-{
-    vector<node> visited;
-    int res;
-    for (int i = 0; i < graph.size(); i++)
-    {
-        visited.clear();
-        node n = graph[i];
-        cout << "starting node: " << n.nodeNum << endl;
-        node parent = n;
-        res = checkCycle(n, parent, visited, graph);
-        cout << "The result is: " << res << endl;
-    }
 }
 
 int main()
