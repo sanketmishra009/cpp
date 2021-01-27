@@ -8,13 +8,13 @@ using namespace std;
 class edge
 {
 public:
-    edge(int node = 999, int cost = 999) : node(node), cost(cost){};
+    edge(int node = 999, int cost = 999, int v = 0) : node(node), cost(cost), v(v){};
     friend ostream &operator<<(ostream &out, const edge edge)
     {
-        out << "Node: " << edge.node << ", Cost: " << edge.cost << endl;
+        out << "Node: " << edge.node << ", Cost: " << edge.cost << " v: " << edge.v << endl;
         return out;
     }
-    int node, cost;
+    int node, cost, v;
 };
 
 class node
@@ -41,58 +41,13 @@ class Kedge
 {
 public:
     Kedge(){};
+    friend ostream &operator<<(ostream &out, const Kedge edge)
+    {
+        out << "Node1: " << edge.n1 << ", Cost: " << edge.cost << " Node2: " << edge.n2 << endl;
+        return out;
+    }
     int n1, n2, cost;
 };
-
-double prob()
-{
-    double prob = static_cast<double>(rand() % 100) / 100;
-    return prob;
-}
-
-int edgeExists(vector<node> graph, int i, int j)
-{
-    int exists = 0;
-    node ni = graph[i];
-    for (auto edge : ni.edges)
-    {
-        if (edge.node == j)
-        {
-            exists = 1;
-        }
-    }
-    return exists;
-}
-
-vector<edge> createEdge(int i, int j)
-{
-    int cost = 1 + rand() % 10;
-    vector<edge> ed(2);
-    ed[0].node = j;
-    ed[0].cost = cost;
-    ed[1].node = i;
-    ed[1].cost = cost;
-    return ed;
-}
-
-void createRandomGraph(vector<node> &graph, int size)
-{
-    cout << "creating random graph." << endl;
-    int exists;
-    for (int i = 0; i < size; i++)
-    {
-        for (int j = 0; j < size; j++)
-        {
-            exists = edgeExists(graph, i, j);
-            if (!exists && i != j && prob() < 0.1)
-            {
-                vector<edge> ed = createEdge(i, j);
-                graph[i].appendEdge(ed[0]);
-                graph[j].appendEdge(ed[1]);
-            }
-        }
-    }
-}
 
 void printRandomGraph(vector<node> graph)
 {
@@ -106,16 +61,6 @@ void printRandomGraph(vector<node> graph)
     }
 }
 
-vector<node> initializeGraph(int size)
-{
-    vector<node> graph(size);
-    for (int i = 0; i < graph.size(); i++)
-    {
-        graph[i].nodeNum = i;
-    }
-    return graph;
-}
-
 void printGraph(vector<node> graph)
 {
     for (auto node : graph)
@@ -124,13 +69,57 @@ void printGraph(vector<node> graph)
     }
 }
 
-Kedge findMinEdgeFromGraph(vector<node> graph, vector<node> closed)
+void markVisited(vector<node> &graph, Kedge Gmin)
 {
-    edge minEdge;
+    for (int i = 0; i < graph.size(); i++)
+    {
+        node *node = &graph[i];
+        if (node->nodeNum == Gmin.n1 || node->nodeNum == Gmin.n2)
+        {
+            for (int j = 0; j < node->edges.size(); j++)
+            {
+                edge *edge = &node->edges[j];
+                if (edge->node == Gmin.n1 || edge->node == Gmin.n2)
+                {
+                    edge->v = 1;
+                }
+            }
+        }
+    }
+}
+
+Kedge findMinEdgeFromNode(node node)
+{
+    Kedge Nmin;
+    Nmin.cost = INT32_MAX;
+    Nmin.n1 = node.nodeNum;
+    for (auto edge : node.edges)
+    {
+        if (edge.cost < Nmin.cost && edge.v == 0)
+        {
+            Nmin.n2 = edge.node;
+            Nmin.cost = edge.cost;
+        }
+    }
+    return Nmin;
+}
+
+Kedge findMinEdgeFromGraph(vector<node> graph)
+{
+    Kedge minEdge, GminEdge;
+    GminEdge.cost = INT32_MAX;
     for (auto node : graph)
     {
-        findMinEdgeFromNode(closed, node.edges);
+        minEdge = findMinEdgeFromNode(node);
+        if (GminEdge.cost > minEdge.cost)
+        {
+            GminEdge = minEdge;
+        }
     }
+    markVisited(graph, GminEdge);
+    cout << "after mark:" << endl;
+    // printRandomGraph(graph);
+    return GminEdge;
 }
 
 void kruskal(vector<node> graph)
@@ -140,32 +129,164 @@ void kruskal(vector<node> graph)
     Kedge k1;
     while (1)
     {
-        k1 = findMinEdgeFromGraph(graph, closed);
-        if (k1)
+        k1 = findMinEdgeFromGraph(graph);
+        cout << k1;
+        printRandomGraph(graph);
+        break;
+    }
+}
+
+vector<node> initializeGraph()
+{
+    node n0, n1, n2, n3, n4, n5, n6, n7;
+    n0.nodeNum = 0;
+    n1.nodeNum = 1;
+    n2.nodeNum = 2;
+    n3.nodeNum = 3;
+    n4.nodeNum = 4;
+    n5.nodeNum = 5;
+    n6.nodeNum = 6;
+    // n7.nodeNum = 7;
+    edge e;
+    e.node = 0;
+    e.cost = 7;
+    n1.appendEdge(e);
+    e.cost = 5;
+    n3.appendEdge(e);
+
+    e.node = 1;
+    e.cost = 7;
+    n0.appendEdge(e);
+    e.cost = 9;
+    n3.appendEdge(e);
+    e.cost = 8;
+    n2.appendEdge(e);
+    e.cost = 7;
+    n4.appendEdge(e);
+
+    e.node = 2;
+    e.cost = 8;
+    n1.appendEdge(e);
+    e.cost = 5;
+    n4.appendEdge(e);
+
+    e.node = 3;
+    e.cost = 5;
+    n0.appendEdge(e);
+    e.cost = 9;
+    n1.appendEdge(e);
+    e.cost = 15;
+    n4.appendEdge(e);
+    e.cost = 6;
+    n5.appendEdge(e);
+
+    e.node = 4;
+    e.cost = 7;
+    n1.appendEdge(e);
+    e.cost = 5;
+    n2.appendEdge(e);
+    e.cost = 15;
+    n3.appendEdge(e);
+    e.cost = 8;
+    n5.appendEdge(e);
+    e.cost = 9;
+    n6.appendEdge(e);
+
+    e.node = 5;
+    e.cost = 6;
+    n3.appendEdge(e);
+    e.cost = 8;
+    n4.appendEdge(e);
+    e.cost = 11;
+    n6.appendEdge(e);
+
+    e.node = 6;
+    e.cost = 11;
+    n5.appendEdge(e);
+    e.cost = 9;
+    n4.appendEdge(e);
+
+    vector<node> g;
+    g.push_back(n0);
+    g.push_back(n1);
+    g.push_back(n2);
+    g.push_back(n3);
+    g.push_back(n4);
+    g.push_back(n5);
+    g.push_back(n6);
+
+    return g;
+}
+
+node getNode(vector<node> graph, int nodeNum)
+{
+    node n;
+    for (auto node : graph)
+    {
+        if (node.nodeNum == nodeNum)
         {
-            for (auto node : graph)
+            n = node;
+        }
+    }
+    return n;
+}
+
+int checkCycle(node n, node parent, vector<node> &visited, vector<node> graph)
+{
+    // cout << "visited at this iteration:" << endl;
+    // printRandomGraph(visited);
+    int cycle = 0, check = 0;
+    node curr;
+    for (auto node : visited)
+    {
+        if (node.nodeNum == n.nodeNum)
+        {
+            // cout << "cycle found at node: " << node.nodeNum << endl
+            //      << "parent node being: " << parent.nodeNum << endl;
+            // printRandomGraph(visited);
+            cycle = 1;
+            return cycle;
+        }
+    }
+    if (!cycle)
+    {
+        visited.push_back(n);
+        for (auto edge : n.edges)
+        {
+            if (edge.node != parent.nodeNum)
             {
-                if (node.nodeNum == k1.n1)
+                // cout << "calling checkCycle at " << edge.node << endl;
+                curr = getNode(graph, edge.node);
+                check = checkCycle(curr, n, visited, graph);
+                if (check)
                 {
-                    n1 = node;
-                }
-                if (node.nodeNum == k1.n2)
-                {
-                    n2 = node;
-                }
-                if (!inClosed(n1))
-                {
-                    closed.push_back(n1);
-                }
-                else
-                {
-                    closed.push_back(n2);
+                    break;
                 }
             }
         }
-        else
-        {
-            break;
-        }
     }
+    return check;
+}
+
+void detectCycle(vector<node> graph)
+{
+    vector<node> visited;
+    int res;
+    for (int i = 0; i < graph.size(); i++)
+    {
+        visited.clear();
+        node n = graph[i];
+        cout << "starting node: " << n.nodeNum << endl;
+        node parent = n;
+        res = checkCycle(n, parent, visited, graph);
+        cout << "The result is: " << res << endl;
+    }
+}
+
+int main()
+{
+    vector<node> graph = initializeGraph();
+    printRandomGraph(graph);
+    // detectCycle(graph);
+    kruskal(graph);
 }
