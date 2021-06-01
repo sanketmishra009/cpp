@@ -9,4 +9,5 @@ int main()
     int a = 11;
     float b = (float)a / 2;
     cout << b << endl;
+    cout << pow(2, 5) << endl;
 }
